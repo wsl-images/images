@@ -3,12 +3,7 @@ name: Build and Push WSL Docker Images
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * 0'
-  push:
-    branches: [ main ]
-    paths:
-      - 'main.go'
-      - '.github/workflows/build-wsl-images.yml'
+    - cron: '0 0 * * *'
 
 jobs:
   check-for-changes:
