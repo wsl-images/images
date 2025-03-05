@@ -181,14 +181,16 @@ func importTarballToDocker(tarFilePath string, tag string, distro DistroDetail) 
 	return baseImageName, imageNameWithTag, currentTime
 }
 
-// pushDockerImage pushes the Docker image to GitHub Packages
 func pushDockerImage(baseImageName string, tag string, dateTag string) {
 	// Get GitHub username from environment (set by GitHub Actions)
 	githubUsername := os.Getenv("GITHUB_REPOSITORY_OWNER")
 	if githubUsername == "" {
 		// Fallback to local user if not in GitHub Actions
-		githubUsername = "StevenBuglione"
+		githubUsername = "stevenbuglione"
 	}
+
+	// Make sure username is lowercase for GitHub Container Registry
+	githubUsername = strings.ToLower(githubUsername)
 
 	// Format for GitHub container registry
 	repoName := strings.ToLower(baseImageName)
@@ -200,21 +202,27 @@ func pushDockerImage(baseImageName string, tag string, dateTag string) {
 	ghcrLatestTag := ghcrBase + ":latest"
 	ghcrDateTag := ghcrBase + ":" + dateTag
 
-	// Tag with GitHub container registry URL
+	// Tag with GitHub container registry URL - with better error logging
 	log.Printf("Tagging %s as %s", imageNameWithTag, ghcrImageTag)
-	if err := exec.Command("docker", "tag", imageNameWithTag, ghcrImageTag).Run(); err != nil {
+	tagCmd := exec.Command("docker", "tag", imageNameWithTag, ghcrImageTag)
+	tagCmd.Stderr = os.Stderr
+	if err := tagCmd.Run(); err != nil {
 		log.Fatalf("Failed to tag image for GitHub Packages: %v", err)
 	}
 
 	// Tag latest
 	log.Printf("Tagging %s as %s", imageNameWithTag, ghcrLatestTag)
-	if err := exec.Command("docker", "tag", imageNameWithTag, ghcrLatestTag).Run(); err != nil {
+	tagLatestCmd := exec.Command("docker", "tag", imageNameWithTag, ghcrLatestTag)
+	tagLatestCmd.Stderr = os.Stderr
+	if err := tagLatestCmd.Run(); err != nil {
 		log.Fatalf("Failed to tag latest image for GitHub Packages: %v", err)
 	}
 
 	// Tag with date
 	log.Printf("Tagging %s as %s", imageNameWithTag, ghcrDateTag)
-	if err := exec.Command("docker", "tag", imageNameWithTag, ghcrDateTag).Run(); err != nil {
+	tagDateCmd := exec.Command("docker", "tag", imageNameWithTag, ghcrDateTag)
+	tagDateCmd.Stderr = os.Stderr
+	if err := tagDateCmd.Run(); err != nil {
 		log.Fatalf("Failed to tag dated image for GitHub Packages: %v", err)
 	}
 
