@@ -1,0 +1,43 @@
+name: Build and Push WSL Docker Images
+
+on:
+  # Run manually
+  workflow_dispatch:
+  # Run on schedule (once a week on Sunday at midnight)
+  schedule:
+    - cron: '0 0 * * 0'
+  # Run on pushes to main branch (if you want)
+  push:
+    branches: [ main ]
+    paths:
+      - 'main.go'
+      - '.github/workflows/build-wsl-images.yml'
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Docker Images
+        run: |
+          go run main.go
+        env:
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
