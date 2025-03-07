@@ -186,7 +186,7 @@ func pushDockerImage(baseImageName string, tag string, dateTag string) {
 	githubUsername := os.Getenv("GITHUB_REPOSITORY_OWNER")
 	if githubUsername == "" {
 		// Fallback to local user if not in GitHub Actions
-		githubUsername = "stevenbuglione"
+		githubUsername = "wsl-images"
 	}
 
 	// Make sure username is lowercase for GitHub Container Registry
