@@ -4,10 +4,6 @@ on:
   workflow_dispatch: # Allow manual triggering
   schedule:
     - cron: '0 0 * * *' # Run every night
-  push: # Run on push events
-    branches:
-      - main
-
 jobs:
   check-for-changes:
     runs-on: ubuntu-latest

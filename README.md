@@ -10,7 +10,6 @@ This project monitors the official [Microsoft WSL DistributionInfo.json](https:/
 
 - **Automatic Updates**: Daily checks for changes to the official WSL distribution list
 - **Version Tagging**: Images are tagged with their distribution version, date, and 'latest'
-- **Multi-Arch Support**: Builds images for AMD64 architecture (ARM64 support can be enabled just not currently implemented)
 - **GitHub Container Registry Integration**: All images are pushed to ghcr.io
 - **Efficient Caching**: Only rebuilds images when distribution files change
 
@@ -23,9 +22,9 @@ ghcr.io/<username>/<distro-name>-wsl:<tag>
 ```
 
 For example:
-- `ghcr.io/stevenbuglione/ubuntu-wsl:24.04`
-- `ghcr.io/stevenbuglione/ubuntu-wsl:latest`
-- `ghcr.io/stevenbuglione/kali-linux-wsl:2024.4`
+- `ghcr.io/wsl-images/ubuntu-wsl:24.04`
+- `ghcr.io/wsl-images/ubuntu-wsl:latest`
+- `ghcr.io/wsl-images/kali-linux-wsl:2024.4`
 
 ## How It Works
 
@@ -43,13 +42,13 @@ For example:
 ### Pull an Image
 
 ```bash
-docker pull ghcr.io/stevenbuglione/ubuntu-wsl:latest
+docker pull ghcr.io/wsl-images/ubuntu-wsl:latest
 ```
 
 ### Use as a Base Image
 
 ```dockerfile
-FROM ghcr.io/stevenbuglione/ubuntu-wsl:24.04
+FROM ghcr.io/wsl-images/ubuntu-wsl:24.04
 RUN apt-get update && apt-get install -y nginx
 # Additional customization...
 ```
@@ -57,7 +56,7 @@ RUN apt-get update && apt-get install -y nginx
 ### Run the Image
 
 ```bash
-docker run -it ghcr.io/stevenbuglione/ubuntu-wsl:latest bash
+docker run -it ghcr.io/wsl-images/ubuntu-wsl:latest bash
 ```
 
 ## Setup Your Own Builder
