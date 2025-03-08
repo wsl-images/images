@@ -4,65 +4,62 @@ on:
   workflow_dispatch: # Allow manual triggering
   schedule:
     - cron: '0 0 * * *' # Run every night
-  push:
-    branches:
-      - main
 jobs:
-  # check-for-changes:
-  #   runs-on: ubuntu-latest
-  #   outputs:
-  #     file_changed: ${{ steps.check.outputs.changed }}
-  #   steps:
-  #     - name: Download upstream file
-  #       id: download
-  #       run: |
-  #         curl -sSL https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json -o DistributionInfo.json
+  check-for-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      file_changed: ${{ steps.check.outputs.changed }}
+    steps:
+      - name: Download upstream file
+        id: download
+        run: |
+          curl -sSL https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json -o DistributionInfo.json
 
-  #     - name: Calculate current file hash
-  #       id: hash
-  #       run: |
-  #         echo "hash=$(sha256sum DistributionInfo.json | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
+      - name: Calculate current file hash
+        id: hash
+        run: |
+          echo "hash=$(sha256sum DistributionInfo.json | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
 
-  #     - name: Restore previous hash from cache
-  #       id: cache-read
-  #       uses: actions/cache@v3
-  #       with:
-  #         path: cached_hash.txt
-  #         key: distribution-info-hash
+      - name: Restore previous hash from cache
+        id: cache-read
+        uses: actions/cache@v3
+        with:
+          path: cached_hash.txt
+          key: distribution-info-hash
 
-  #     - name: Compare file hash
-  #       id: check
-  #       run: |
-  #         CURRENT_HASH="${{ steps.hash.outputs.hash }}"
-  #         if [ -f cached_hash.txt ]; then
-  #           PREV_HASH=$(cat cached_hash.txt)
-  #         else
-  #           PREV_HASH=""
-  #         fi
-  #         echo "Previous hash: $PREV_HASH"
-  #         echo "Current hash:  $CURRENT_HASH"
-  #         if [ "$CURRENT_HASH" != "$PREV_HASH" ]; then
-  #           echo "File changed."
-  #           echo "changed=true" >> $GITHUB_OUTPUT
-  #         else
-  #           echo "File not changed."
-  #           echo "changed=false" >> $GITHUB_OUTPUT
-  #         fi
+      - name: Compare file hash
+        id: check
+        run: |
+          CURRENT_HASH="${{ steps.hash.outputs.hash }}"
+          if [ -f cached_hash.txt ]; then
+            PREV_HASH=$(cat cached_hash.txt)
+          else
+            PREV_HASH=""
+          fi
+          echo "Previous hash: $PREV_HASH"
+          echo "Current hash:  $CURRENT_HASH"
+          if [ "$CURRENT_HASH" != "$PREV_HASH" ]; then
+            echo "File changed."
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "File not changed."
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
 
-  #     - name: Save new hash if changed
-  #       if: steps.check.outputs.changed == 'true'
-  #       run: echo "${{ steps.hash.outputs.hash }}" > cached_hash.txt
+      - name: Save new hash if changed
+        if: steps.check.outputs.changed == 'true'
+        run: echo "${{ steps.hash.outputs.hash }}" > cached_hash.txt
 
-  #     - name: Update hash cache
-  #       if: steps.check.outputs.changed == 'true'
-  #       uses: actions/cache@v3
-  #       with:
-  #         path: cached_hash.txt
-  #         key: distribution-info-hash
+      - name: Update hash cache
+        if: steps.check.outputs.changed == 'true'
+        uses: actions/cache@v3
+        with:
+          path: cached_hash.txt
+          key: distribution-info-hash
 
   build-and-push:
-    # needs: check-for-changes
-    # if: needs.check-for-changes.outputs.file_changed == 'true'
+    needs: check-for-changes
+    if: needs.check-for-changes.outputs.file_changed == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read

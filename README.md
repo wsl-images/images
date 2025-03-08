@@ -1,6 +1,6 @@
 # WSL Docker Images Builder
 
-A GitHub Action workflow that automatically builds and maintains Docker images based on the official Windows Subsystem for Linux (WSL) distributions.
+A GitHub Action workflow that automatically builds and maintains Docker images of the official Windows Subsystem for Linux (WSL) distributions.
 
 ## Overview
 
@@ -18,13 +18,13 @@ This project monitors the official [Microsoft WSL DistributionInfo.json](https:/
 Images are published to GitHub Container Registry with the following naming convention:
 
 ```
-ghcr.io/<username>/<distro-name>-wsl:<tag>
+ghcr.io/<username>/<distro-name>:<tag>
 ```
 
 For example:
-- `ghcr.io/wsl-images/ubuntu-wsl:24.04`
-- `ghcr.io/wsl-images/ubuntu-wsl:latest`
-- `ghcr.io/wsl-images/kali-linux-wsl:2024.4`
+- `ghcr.io/wsl-images/ubuntu:24.04`
+- `ghcr.io/wsl-images/ubuntu:latest`
+- `ghcr.io/wsl-images/kali-linux:2024.4`
 
 ## How It Works
 
@@ -42,13 +42,13 @@ For example:
 ### Pull an Image
 
 ```bash
-docker pull ghcr.io/wsl-images/ubuntu-wsl:latest
+docker pull ghcr.io/wsl-images/ubuntu:latest
 ```
 
 ### Use as a Base Image
 
 ```dockerfile
-FROM ghcr.io/wsl-images/ubuntu-wsl:24.04
+FROM ghcr.io/wsl-images/ubuntu:24.04
 RUN apt-get update && apt-get install -y nginx
 # Additional customization...
 ```
@@ -56,7 +56,7 @@ RUN apt-get update && apt-get install -y nginx
 ### Run the Image
 
 ```bash
-docker run -it ghcr.io/wsl-images/ubuntu-wsl:latest bash
+docker run -it ghcr.io/wsl-images/ubuntu:latest bash
 ```
 
 ## Setup Your Own Builder
@@ -67,7 +67,7 @@ docker run -it ghcr.io/wsl-images/ubuntu-wsl:latest bash
     - Ensure `GITHUB_TOKEN` has packages write permission
 
 3. **Customize the Workflow** (Optional):
-    - Modify `.github/workflows/build-wsl-images.yml` to select specific distributions or architectures
+    - Modify `.github/workflows/build-images.yml` to select specific distributions or architectures
 
 ## Development
 
