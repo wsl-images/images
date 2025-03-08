@@ -145,7 +145,7 @@ func extractVersionFromURL(url string) string {
 // importTarballToDocker imports the tarball into Docker
 func importTarballToDocker(tarFilePath string, tag string, distro DistroDetail) (string, string, string) {
 	// Base image name without tag
-	baseImageName := strings.ToLower(distro.Name) + "-wsl"
+	baseImageName := strings.ToLower(distro.Name)
 
 	// Image name with version tag
 	imageNameWithTag := baseImageName + ":" + tag
