@@ -196,8 +196,8 @@ func pushDockerImage(baseImageName string, tag string, dateTag string) {
 	repoName := strings.ToLower(baseImageName)
 	ghcrBase := fmt.Sprintf("ghcr.io/%s/%s", githubUsername, repoName)
 
-	// Format for Quay.io repository
-	quayBase := fmt.Sprintf("quay.io/wsl-images/images:%s", repoName)
+	// Format for Quay.io repository - without tag
+	quayRepo := "quay.io/wsl-images/images"
 
 	// Tag images for the GitHub container registry
 	imageNameWithTag := baseImageName + ":" + tag
@@ -239,10 +239,10 @@ func pushDockerImage(baseImageName string, tag string, dateTag string) {
 	}
 	log.Printf("Docker images pushed successfully to GitHub Packages")
 
-	// Tag images for Quay.io
-	quayImageTag := quayBase + "-" + tag
-	quayLatestTag := quayBase + "-latest"
-	quayDateTag := quayBase + "-" + dateTag
+	// Tag images for Quay.io with proper tags that include the distribution name
+	quayImageTag := fmt.Sprintf("%s:%s-%s", quayRepo, repoName, tag)
+	quayLatestTag := fmt.Sprintf("%s:%s-latest", quayRepo, repoName)
+	quayDateTag := fmt.Sprintf("%s:%s-%s", quayRepo, repoName, dateTag)
 
 	// Tag with Quay.io repository URL
 	log.Printf("Tagging %s as %s", imageNameWithTag, quayImageTag)
@@ -268,14 +268,18 @@ func pushDockerImage(baseImageName string, tag string, dateTag string) {
 		log.Fatalf("Failed to tag dated image for Quay.io: %v", err)
 	}
 
-	// Push all Quay.io tags
-	log.Printf("Pushing image %s to Quay.io", quayBase)
-	pushQuayCmd := exec.Command("docker", "push", "--all-tags", quayBase)
-	pushQuayCmd.Stdout = os.Stdout
-	pushQuayCmd.Stderr = os.Stderr
-	if err := pushQuayCmd.Run(); err != nil {
-		log.Fatalf("Failed to push docker images to Quay.io: %v", err)
+	// Push each Quay.io tag individually since we can't use --all-tags
+	log.Printf("Pushing image tags to Quay.io")
+
+	for _, tag := range []string{quayImageTag, quayLatestTag, quayDateTag} {
+		pushQuayTagCmd := exec.Command("docker", "push", tag)
+		pushQuayTagCmd.Stdout = os.Stdout
+		pushQuayTagCmd.Stderr = os.Stderr
+		if err := pushQuayTagCmd.Run(); err != nil {
+			log.Fatalf("Failed to push docker image to Quay.io: %v", err)
+		}
 	}
+
 	log.Printf("Docker images pushed successfully to Quay.io")
 }
 
