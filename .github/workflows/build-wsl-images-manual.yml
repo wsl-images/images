@@ -1,0 +1,39 @@
+name: Manual Rebuild of WSL Docker Images
+
+on:
+  workflow_dispatch: # Only triggered manually
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Login to Quay.io
+        uses: docker/login-action@v3
+        with:
+          registry: quay.io
+          username: wsl-images+builder
+          password: ${{ secrets.QUAY_ROBOT_TOKEN }}
+
+      - name: Build and Push Docker Images
+        run: |
+          go run main.go
+        env:
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}

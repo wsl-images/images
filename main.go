@@ -196,13 +196,16 @@ func pushDockerImage(baseImageName string, tag string, dateTag string) {
 	repoName := strings.ToLower(baseImageName)
 	ghcrBase := fmt.Sprintf("ghcr.io/%s/%s", githubUsername, repoName)
 
+	// Format for Quay.io repository
+	quayBase := fmt.Sprintf("quay.io/wsl-images/images:%s", repoName)
+
 	// Tag images for the GitHub container registry
 	imageNameWithTag := baseImageName + ":" + tag
 	ghcrImageTag := ghcrBase + ":" + tag
 	ghcrLatestTag := ghcrBase + ":latest"
 	ghcrDateTag := ghcrBase + ":" + dateTag
 
-	// Tag with GitHub container registry URL - with better error logging
+	// Tag with GitHub container registry URL
 	log.Printf("Tagging %s as %s", imageNameWithTag, ghcrImageTag)
 	tagCmd := exec.Command("docker", "tag", imageNameWithTag, ghcrImageTag)
 	tagCmd.Stderr = os.Stderr
@@ -210,7 +213,7 @@ func pushDockerImage(baseImageName string, tag string, dateTag string) {
 		log.Fatalf("Failed to tag image for GitHub Packages: %v", err)
 	}
 
-	// Tag latest
+	// Tag latest for GitHub
 	log.Printf("Tagging %s as %s", imageNameWithTag, ghcrLatestTag)
 	tagLatestCmd := exec.Command("docker", "tag", imageNameWithTag, ghcrLatestTag)
 	tagLatestCmd.Stderr = os.Stderr
@@ -218,7 +221,7 @@ func pushDockerImage(baseImageName string, tag string, dateTag string) {
 		log.Fatalf("Failed to tag latest image for GitHub Packages: %v", err)
 	}
 
-	// Tag with date
+	// Tag with date for GitHub
 	log.Printf("Tagging %s as %s", imageNameWithTag, ghcrDateTag)
 	tagDateCmd := exec.Command("docker", "tag", imageNameWithTag, ghcrDateTag)
 	tagDateCmd.Stderr = os.Stderr
@@ -226,16 +229,54 @@ func pushDockerImage(baseImageName string, tag string, dateTag string) {
 		log.Fatalf("Failed to tag dated image for GitHub Packages: %v", err)
 	}
 
-	// Push all tags
+	// Push all GitHub tags
 	log.Printf("Pushing image %s to GitHub Packages", ghcrBase)
 	pushCmd := exec.Command("docker", "push", "--all-tags", ghcrBase)
 	pushCmd.Stdout = os.Stdout
 	pushCmd.Stderr = os.Stderr
 	if err := pushCmd.Run(); err != nil {
-		log.Fatalf("Failed to push docker images: %v", err)
+		log.Fatalf("Failed to push docker images to GitHub: %v", err)
+	}
+	log.Printf("Docker images pushed successfully to GitHub Packages")
+
+	// Tag images for Quay.io
+	quayImageTag := quayBase + "-" + tag
+	quayLatestTag := quayBase + "-latest"
+	quayDateTag := quayBase + "-" + dateTag
+
+	// Tag with Quay.io repository URL
+	log.Printf("Tagging %s as %s", imageNameWithTag, quayImageTag)
+	tagQuayCmd := exec.Command("docker", "tag", imageNameWithTag, quayImageTag)
+	tagQuayCmd.Stderr = os.Stderr
+	if err := tagQuayCmd.Run(); err != nil {
+		log.Fatalf("Failed to tag image for Quay.io: %v", err)
 	}
 
-	log.Printf("Docker images pushed successfully to GitHub Packages")
+	// Tag latest for Quay.io
+	log.Printf("Tagging %s as %s", imageNameWithTag, quayLatestTag)
+	tagQuayLatestCmd := exec.Command("docker", "tag", imageNameWithTag, quayLatestTag)
+	tagQuayLatestCmd.Stderr = os.Stderr
+	if err := tagQuayLatestCmd.Run(); err != nil {
+		log.Fatalf("Failed to tag latest image for Quay.io: %v", err)
+	}
+
+	// Tag with date for Quay.io
+	log.Printf("Tagging %s as %s", imageNameWithTag, quayDateTag)
+	tagQuayDateCmd := exec.Command("docker", "tag", imageNameWithTag, quayDateTag)
+	tagQuayDateCmd.Stderr = os.Stderr
+	if err := tagQuayDateCmd.Run(); err != nil {
+		log.Fatalf("Failed to tag dated image for Quay.io: %v", err)
+	}
+
+	// Push all Quay.io tags
+	log.Printf("Pushing image %s to Quay.io", quayBase)
+	pushQuayCmd := exec.Command("docker", "push", "--all-tags", quayBase)
+	pushQuayCmd.Stdout = os.Stdout
+	pushQuayCmd.Stderr = os.Stderr
+	if err := pushQuayCmd.Run(); err != nil {
+		log.Fatalf("Failed to push docker images to Quay.io: %v", err)
+	}
+	log.Printf("Docker images pushed successfully to Quay.io")
 }
 
 // downloadFile downloads a file from the given URL and saves it to the specified filepath
