@@ -15,7 +15,11 @@ This project monitors the official [Microsoft WSL DistributionInfo.json](https:/
 
 ## Available Images
 
-Images are published to GitHub Container Registry with the following naming convention:
+Images are published to both GitHub Container Registry and Quay.io.
+
+### GitHub Container Registry
+
+Images on GitHub Container Registry use the following naming convention:
 
 ```
 ghcr.io/<username>/<distro-name>:<tag>
@@ -25,6 +29,18 @@ For example:
 - `ghcr.io/wsl-images/ubuntu:24.04`
 - `ghcr.io/wsl-images/ubuntu:latest`
 - `ghcr.io/wsl-images/kali-linux:2024.4`
+
+### Quay.io
+
+Images on Quay.io use the following naming convention:
+```
+quay.io/wsl-images/images:<distro-name>-<tag></tag>
+```
+
+For example:
+- `quay.io/wsl-images/images:ubuntu-24.04`
+- `quay.io/wsl-images/images:ubuntu-latest`
+- `quay.io/wsl-images/images:kali-linux-2024.4`
 
 ## How It Works
 
