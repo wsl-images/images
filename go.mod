@@ -1,3 +1,3 @@
-module github.com/sbuglione/wslb-image
+module github.com/wsl-images/images
 
-go 1.23.6
+go 1.26.0

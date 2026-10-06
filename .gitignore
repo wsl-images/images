@@ -1,2 +1,6 @@
 .idea
 /.idea/
+/.build-success
+/images
+/images.exe
+*.part
