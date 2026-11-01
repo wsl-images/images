@@ -115,7 +115,7 @@ jobs:
           command -v zstd
       - name: Log in to GHCR
         if: steps.decision.outputs.build == 'true' && env.PUBLISH == 'true'
-        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -124,7 +124,7 @@ jobs:
         id: quay
         if: steps.decision.outputs.build == 'true' && env.PUBLISH == 'true' && env.QUAY_ENABLED == 'true'
         continue-on-error: true # GHCR can still publish if the mirror login fails.
-        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
         with:
           registry: quay.io
           username: ${{ vars.QUAY_USERNAME || 'wsl-images+builder' }}
